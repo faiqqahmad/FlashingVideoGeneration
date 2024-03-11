@@ -91,6 +91,28 @@ def moveAllFiles():
                 print('operation is invalid')
 
 
+def compileVideo():
+
+    ffmpeg = [
+
+        "ffmpeg",
+        "-framerate", "30",
+        "-i", "allFrames/nframes_%06d.png",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        "output/output_video.mp4"
+
+    ]
+
+    try:
+        subprocess.run(ffmpeg, check=True)
+        print('Suceeded')
+    except subprocess.CalledProcessError as e:
+        print("Failed")
+
+
 generateBlackFrames(1640, 1624, 30)
 
 time.sleep(2)
@@ -107,5 +129,6 @@ time.sleep(1)
 
 moveAllFiles()
 
+time.sleep(1)
 
-# rename("vidFrames", "nframe", 6, 2)
+compileVideo()
