@@ -4,7 +4,7 @@ import time
 import shutil
 from moviepy.editor import VideoFileClip
 
-inputName = "input_video.mp4"
+inputName = "input.mov"
 frameRate = 60
 
 
@@ -137,7 +137,7 @@ def getHeight():
 
     video_path = f'input/{inputName}'
     video_clip = VideoFileClip(video_path)
-    height = video_clip.h  # Height of the video
+    height = video_clip.h
     video_clip.close()
     return height
 
@@ -146,20 +146,31 @@ def getWidth():
 
     video_path = f'input/{inputName}'
     video_clip = VideoFileClip(video_path)
-    width = video_clip.w  # Height of the video
+    width = video_clip.w
     video_clip.close()
     return width
 
 
-generateBlackFrames(getHeight(), getWidth(), findDuration() * frameRate)
-time.sleep(2)
-rename("blackFrames", "nframes", 11, 2, "o")
-generateVidFrames("input_video.mp4")
-time.sleep(2)
-rename("vidFrames", "nframes", 6, 2, "e")
-time.sleep(1)
-moveAllFiles()
-time.sleep(1)
-compileVideo()
-resetFolders()
-findFrameRate()
+def main():
+
+    start_time = time.perf_counter()
+    print(getHeight(), getWidth())
+    generateBlackFrames(getWidth(), getHeight(), findDuration() * frameRate)
+    time.sleep(2)
+    rename("blackFrames", "nframes", 11, 2, "o")
+    generateVidFrames(inputName)
+    time.sleep(2)
+    rename("vidFrames", "nframes", 6, 2, "e")
+    time.sleep(1)
+    moveAllFiles()
+    time.sleep(1)
+    compileVideo()
+    resetFolders()
+    findFrameRate()
+    end_time = time.perf_counter()
+    total_time = end_time - start_time
+    print(f"Program took {total_time} seconds to run.")
+
+
+if __name__ == "__main__":
+    main()
