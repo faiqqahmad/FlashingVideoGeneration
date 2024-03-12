@@ -3,9 +3,7 @@ import os
 import time
 import shutil
 from moviepy.editor import VideoFileClip
-
-inputName = "input.mov"
-frameRate = 60
+import sys
 
 
 def appendZero(i, length):
@@ -41,7 +39,7 @@ def rename(directory, name, zLoc, increment, type):
             print("invalid file")
 
 
-def generateVidFrames(input):
+def generateVidFrames(input, frameRate):
 
     input = "input/" + input
     ffmpeg = [
@@ -89,7 +87,7 @@ def moveAllFiles():
                 print('operation is invalid')
 
 
-def compileVideo():
+def compileVideo(frameRate, output):
 
     ffmpeg = [
         "ffmpeg",
@@ -99,7 +97,7 @@ def compileVideo():
         "libx264",
         "-pix_fmt",
         "yuv420p",
-        "output/output_video.mp4"
+        f"output/{output}"
     ]
     try:
         subprocess.run(ffmpeg, check=True)
@@ -119,21 +117,21 @@ def resetFolders():
         print(f"The folder {folder_path} does not exist.")
 
 
-def findDuration():
+def findDuration(inputName):
 
     video_path = f'input/{inputName}'
     clip = VideoFileClip(video_path)
     return clip.duration
 
 
-def findFrameRate():
+def findFrameRate(outputName):
 
-    video_path = f'output/output_video.mp4'
+    video_path = f'output/{outputName}'
     clip = VideoFileClip(video_path)
     print(f'Frame Rate: {clip.fps}')
 
 
-def getHeight():
+def getHeight(inputName):
 
     video_path = f'input/{inputName}'
     video_clip = VideoFileClip(video_path)
@@ -142,7 +140,7 @@ def getHeight():
     return height
 
 
-def getWidth():
+def getWidth(inputName):
 
     video_path = f'input/{inputName}'
     video_clip = VideoFileClip(video_path)
@@ -153,23 +151,41 @@ def getWidth():
 
 def main():
 
-    start_time = time.perf_counter()
-    print(getHeight(), getWidth())
-    generateBlackFrames(getWidth(), getHeight(), findDuration() * frameRate)
-    time.sleep(2)
-    rename("blackFrames", "nframes", 11, 2, "o")
-    generateVidFrames(inputName)
-    time.sleep(2)
-    rename("vidFrames", "nframes", 6, 2, "e")
-    time.sleep(1)
-    moveAllFiles()
-    time.sleep(1)
-    compileVideo()
-    resetFolders()
-    findFrameRate()
-    end_time = time.perf_counter()
-    total_time = end_time - start_time
-    print(f"Program took {total_time} seconds to run.")
+    print(sys.argv)
+    # or (not len(sys.argv) == 3) or (not len(sys.argv) == 4)
+
+    if int(sys.argv[2]) < 1:
+        print("Invalid args")
+    else:
+
+        inputName = "input.mov"
+        frameRate = 60
+        outputName = "output.mov"
+
+        inputName = sys.argv[1]
+        frameRate = int(sys.argv[2])
+
+        if len(sys.argv) == 4:
+            outputName = sys.argv[3]
+
+        start_time = time.perf_counter()
+        print(getHeight(inputName), getWidth(inputName))
+        generateBlackFrames(getWidth(inputName), getHeight(inputName),
+                            findDuration(inputName) * frameRate)
+        time.sleep(2)
+        rename("blackFrames", "nframes", 11, 2, "o")
+        generateVidFrames(inputName, frameRate)
+        time.sleep(2)
+        rename("vidFrames", "nframes", 6, 2, "e")
+        time.sleep(1)
+        moveAllFiles()
+        time.sleep(1)
+        compileVideo(frameRate, outputName)
+        resetFolders()
+        findFrameRate(outputName)
+        end_time = time.perf_counter()
+        total_time = end_time - start_time
+        print(f"Program took {total_time} seconds to run.")
 
 
 if __name__ == "__main__":
